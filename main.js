@@ -8,10 +8,16 @@
     let currentYear = currentDate.getFullYear();
     let currentMonth = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // +1, так как месяцы начинаются с 0
     let currentDay = currentDate.getDate().toString().padStart(2, '0');
-    let formattedCurrentDate = `${currentDay}.${currentMonth}.${currentYear}`;
+    let formattedCurrentDate = `${currentYear}-${currentMonth}-${currentDay}`;
 
     // Создаём форму для добавления нового студента
     let formAddStudent = document.createElement('form');
+    let blockName = document.createElement('div');
+    let blockSurname = document.createElement('div');
+    let blockMiddleName = document.createElement('div');
+    let blockDateBirth = document.createElement('div');
+    let blockYearStartEducation = document.createElement('div');
+    let blockFaculty = document.createElement('div');
     let inputName = document.createElement('input');
     let inputSurname = document.createElement('input');
     let inputMiddleName = document.createElement('input');
@@ -19,7 +25,21 @@
     let inputYearStartEducation = document.createElement('input');
     let inputFaculty = document.createElement('input');
     let btnAddStudent = document.createElement('button');
-
+  
+    formAddStudent.classList.add('form');
+    blockName.classList.add('form-group');
+    blockSurname.classList.add('form-group');
+    blockMiddleName.classList.add('form-group');
+    blockDateBirth.classList.add('form-group');
+    blockYearStartEducation.classList.add('form-group');
+    blockFaculty.classList.add('form-group');
+    inputName.classList.add('form-control');
+    inputSurname.classList.add('form-control');
+    inputMiddleName.classList.add('form-control');
+    inputDateBirth.classList.add('form-control');
+    inputYearStartEducation.classList.add('form-control');
+    inputFaculty.classList.add('form-control');
+    btnAddStudent.classList.add('btn', 'btn-primary');
     inputName.placeholder = 'Имя';
     inputSurname.placeholder = 'Фамилия';
     inputMiddleName.placeholder = 'Отчество';
@@ -32,14 +52,22 @@
     inputYearStartEducation.min = '2000';
     inputYearStartEducation.max = currentYear;
     inputFaculty.placeholder = 'Факультет';
+    btnAddStudent.type = 'submit';
     btnAddStudent.textContent = 'Добавить';
 
-    formAddStudent.append(inputName, inputSurname, inputMiddleName, inputDateBirth, inputYearStartEducation, inputFaculty, btnAddStudent);
+    blockName.append(inputName);
+    blockSurname.append(inputSurname);
+    blockMiddleName.append(inputMiddleName);
+    blockDateBirth.append(inputDateBirth);
+    blockYearStartEducation.append(inputYearStartEducation);
+    blockFaculty.append(inputFaculty);
+    formAddStudent.append(blockName, blockSurname, blockMiddleName, blockDateBirth, blockYearStartEducation, blockFaculty, btnAddStudent);
     document.body.append(formAddStudent);
     
     // Создаём таблицу студентов
     let titleTable = document.createElement('h2');
     titleTable.textContent = 'Список студентов';
+    titleTable.classList.add('text-muted');
 
     let tableStudents = document.createElement('table');
     let thead = document.createElement('thead');
@@ -49,6 +77,8 @@
     let thDateBirthAge = document.createElement('th');
     let thYearEducationCourse = document.createElement('th');
     let tbody = document.createElement('tbody');
+     
+    tableStudents.classList.add('table', 'table-bordered');
 
     thFullName.textContent = 'ФИО студента';
     thFaculty.textContent = 'Факультет';
@@ -62,6 +92,7 @@
 
     // Создаём функцию, которая возвращает строку с новым студентом
     function getNewStudentItem(studentsArray, index) {
+        // создаём ячейки
         let trNewStudent = document.createElement('tr');
         let tdFullName = document.createElement('td');
         let tdFaculty = document.createElement('td');
@@ -69,22 +100,32 @@
         let tdYearEducationCourse = document.createElement('td');
 
         // Вычисляем возраст студента
-        // let now = new Date(); //Текущя дата
-        // let today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); //Текущя дата без времени
-        // let dob = studentsArray[index].dateBirth; //Дата рождения
-        // let dobnow = new Date(currentYear, dob.getMonth(), dob.getDate()); //ДР в текущем году
-        // let ageStudent = currentYear - dob.getFullYear(); //Возраст
-        // //Если ДР в этом году ещё предстоит, то вычитаем из ageStudent один год
-        // if (formattedCurrentDate < dobnow) {
-        //     ageStudent = ageStudent - 1;
-        // };
+        let now = new Date(); //Текущя дата
+        let today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); //Текущя дата без времени
+        let dob = new Date(studentsArray[index].dateBirth); //Дата рождения
+        let dobnow = new Date(today.getFullYear(), dob.getMonth(), dob.getDate()); //ДР в текущем году
+        let ageStudent = today.getFullYear() - dob.getFullYear(); //Возраст = текущий год - год рождения        
+        //Если ДР в этом году ещё предстоит, то вычитаем из age один год
+        if (today < dobnow) {
+            ageStudent = ageStudent - 1;
+        };
 
-        let ageStudent = formattedCurrentDate - studentsArray[index].dateBirth;
+        // Приводим дату рождения в нужный нам формат
+        let dataBirth = studentsArray[index].dateBirth;
+        // Разбиваем строку на части (год, месяц, день)
+        let parts = dataBirth.split("-");
+        // Создаем новую дату в нужном формате
+        let formattedDataBirth = parts[2] + "." + parts[1] + "." + parts[0];
 
+        // добавляем контент в ячейки
         tdFullName.textContent = `${studentsArray[index].surname} ${studentsArray[index].name} ${studentsArray[index].middleName}`;
-        tdFaculty.textContent = studentsArray[index].faculty;
-        tdDateBirthAge = `${studentsArray[index].dateBirth} (${ageStudent} лет)`;
-        tdYearEducationCourse = `${studentsArray[index].yearStartEducation}-${currentYear} (${currentYear - studentsArray[index].yearStartEducation} курс)`;
+        tdFaculty.textContent = studentsArray[index].faculty;        
+        tdDateBirthAge.textContent = `${formattedDataBirth} (${ageStudent} лет)`;
+        if (studentsArray[index].yearStartEducation <= currentYear - 4) {
+            tdYearEducationCourse.textContent = `${studentsArray[index].yearStartEducation}-${studentsArray[index].yearStartEducation + 4} (закончил)`;
+        } else {
+            tdYearEducationCourse.textContent = `${studentsArray[index].yearStartEducation}-${currentYear} (${currentYear - studentsArray[index].yearStartEducation + 1} курс)`;
+        };
 
         trNewStudent.append(tdFullName, tdFaculty, tdDateBirthAge, tdYearEducationCourse);
         
@@ -107,9 +148,9 @@
         e.preventDefault();
 
         // игнорируем создание элемента, если пользователь ничего не ввёл хотябы в одно поле (кроме отчества)
-        // if (!NameValue || !SurnameValue || !dateBirthValue || !yearStartEducationValue || !facultyValue) {                
-        //     return;
-        // };
+        if (!inputName.value.trim() || !inputSurname.value.trim() || !inputDateBirth.value || !inputYearStartEducation.value || !inputFaculty.value.trim()) {                
+            return;
+        };
 
         // Создаём переменные с обработанными данными из полей ввода
         let NameValue = inputName.value.trim();
@@ -123,7 +164,7 @@
         let birthYear = dateBirthValue.getFullYear();
         let birthMonth = (dateBirthValue.getMonth() + 1).toString().padStart(2, '0'); // +1, так как месяцы начинаются с 0
         let birthDay = dateBirthValue.getDate().toString().padStart(2, '0');
-        let formattedDateBirth = `${birthDay}.${birthMonth}.${birthYear}`;
+        let formattedDateBirth = `${birthYear}-${birthMonth}-${birthDay}`;
 
         // Добавление созданных элементов в массив
         arrStudents.push({
@@ -145,6 +186,5 @@
         inputDateBirth.value = '';
         inputYearStartEducation.value = '';
         inputFaculty.value = '';
-    });
-    
+    });    
 })();

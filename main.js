@@ -10,6 +10,9 @@
     let currentDay = currentDate.getDate().toString().padStart(2, '0');
     let formattedCurrentDate = `${currentYear}-${currentMonth}-${currentDay}`;
 
+    // Функция создания инпута
+    // function getInput(type, placeholder, )
+
     // Создаём форму для добавления нового студента
     let formAddStudent = document.createElement('form');
     let blockName = document.createElement('div');
@@ -79,6 +82,10 @@
     let tbody = document.createElement('tbody');
      
     tableStudents.classList.add('table', 'table-bordered');
+    thFullName.classList.add('th_click');
+    thFaculty.classList.add('th_click');
+    thDateBirthAge.classList.add('th_click');
+    thYearEducationCourse.classList.add('th_click');
 
     thFullName.textContent = 'ФИО студента';
     thFaculty.textContent = 'Факультет';
@@ -186,5 +193,32 @@
         inputDateBirth.value = '';
         inputYearStartEducation.value = '';
         inputFaculty.value = '';
-    });    
+    }); 
+    
+    // Добавляем фильтрацию на столбцы    
+    // Добавляем обработчики событий на каждую ячейку заголовка таблицы, при нажатии на ячейку будет происходить фильтрация
+    thFullName.addEventListener('click', () => {        
+        arrStudents.sort((a, b) => {
+            let fullNameA = `${a.surname}${a.name}${a.middleName}`;
+            let fullNameB = `${b.surname}${b.name}${b.middleName}`;
+            return fullNameA.localeCompare(fullNameB);
+        });        
+        render(arrStudents);    
+    });
+
+    thFaculty.addEventListener('click', () => {
+        arrStudents.sort((a, b) => a.faculty.localeCompare(b.faculty));
+        render(arrStudents);
+    });
+
+    thDateBirthAge.addEventListener('click', () => {
+        arrStudents.sort((a, b) => new Date(b.dateBirth) - new Date(a.dateBirth));
+        render(arrStudents);
+    });
+
+    thYearEducationCourse.addEventListener('click', () => {
+        arrStudents.sort((a, b) => a.yearStartEducation - b.yearStartEducation);
+        render(arrStudents);
+    });
+
 })();
